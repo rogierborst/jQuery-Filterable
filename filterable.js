@@ -1,9 +1,15 @@
 ;(function($, window, document, undefined){
     'use strict';
 
+    var pluginName = 'filterable';
+
     var defaults = {
+        tickCheckboxesAtStart: false,
+        clearSearchBoxAtStart: false,
         caseSensitiveFilter: false,
         caseSensitiveSearch: false,
+        emptyTableMessage: '',
+        emptyTableMessageClass: 'empty-table-message',
         arrayColumns: {}
     };
 
@@ -14,6 +20,7 @@
         self.activeFilter = {};
         self.activeFilterColumns = [];
         self.activeSearchTerm = '';
+        self.numberOfColumns = 0;
 
         self.init();
     }
@@ -24,32 +31,61 @@
             var self = this;
             self.$controls = $(self.$table.data('filter-controls'));
             self.$searchBox = $(self.$table.data('search-controls'));
+            self.numberOfColumns = $('thead th', self.$table).length;
+
+            if ( self.config.tickCheckboxesAtStart ){
+                // check all control checkboxes if instructed to do so in the options
+                $('input:checkbox', self.$controls).prop('checked', true);
+            } else {
+                // add all unchecked boxes to the active filter and... filter!
+                $('input:checkbox:not(:checked)', self.$controls).each(function(){
+                    self.updateFilter($(this).data('filter-col'), $(this).val());
+                });
+            }
+
+            if ( self.config.clearSearchBoxAtStart ){
+                self.$searchBox.val('');
+            } else if ( self.$searchBox.val() ){
+                self.updateSearchTerm(self.$searchBox.val());
+            }
+
+            if ( self.config.emptyTableMessage ){
+                self.setupEmptyTableMessage();
+            }
 
             // Listen for checkbox changes
             self.$controls.on('change', 'input[type=checkbox]', function(){
                 self.updateFilter($(this).data('filter-col'), $(this).val());
-                self.checkRows();
             });
 
             // Listen for changes in the search box
             self.$searchBox.on('keyup', function(){
                 self.updateSearchTerm($(this).val());
-                self.checkRows();
             });
 
         },
 
         // Loop through rows and hide or show them
         checkRows: function(){
-            var self = this;
+            var self = this,
+                emptyMessageClass = self.config.emptyTableMessageClass;
 
-            self.$table.find('tbody tr').each(function(){
+            $('tbody tr', self.$table).each(function(){
+                // skip the "empty table message" row
+                if ( $(this).hasClass(emptyMessageClass) ){
+                    return;
+                }
+
                 if ( self.rowIsFiltered(this) || !self.rowContainsSearchItem(this) ){
                     $(this).hide();
                 } else {
                     $(this).show();
                 }
             });
+
+            if ( self.config.emptyTableMessage ){
+                self.checkIfTableIsEmpty();
+            }
         },
 
         // Check if row should be hidden
@@ -58,7 +94,7 @@
 
             for ( var i in this.activeFilterColumns ){
                 var currentFilteredColumn = this.activeFilterColumns[i],
-                    textAtColumn = $($(row).find('td')[currentFilteredColumn]).text();
+                    textAtColumn = $(row).find('td').eq(currentFilteredColumn).text();
 
                 // check if we are dealing with an arrayFilter
                 if ( this.config.arrayColumns.hasOwnProperty(currentFilteredColumn) ) {
@@ -170,19 +206,54 @@
                 }
             }, this));
 
+            this.checkRows();
         },
 
         updateSearchTerm: function(searchTerm){
             this.activeSearchTerm = this.config.caseSensitiveSearch ? searchTerm : searchTerm.toUpperCase();
-            console.log(this.activeSearchTerm);
+            this.checkRows();
+        },
+
+        setupEmptyTableMessage: function(){
+            var $row = $('<tr></tr>').addClass(this.config.emptyTableMessageClass);
+
+            $('<td></td>')
+                .attr('colspan', this.numberOfColumns)
+                .html(this.config.emptyTableMessage)
+                .appendTo($row);
+            $row.hide().prependTo('tbody', this.$table);
+        },
+
+        checkIfTableIsEmpty: function(){
+            var emptyMessageClass = this.config.emptyTableMessageClass,
+                $visibleRows = $('tbody tr:visible', self.$table);
+
+            // if no rows are visible, show the empty table message
+            if ( ! $visibleRows.length ){
+                $('.' + emptyMessageClass).show();
+                return true;
+            }
+
+            // if the only visible row IS the message row, do nothing
+            if ( $visibleRows.length === $('.' + emptyMessageClass).length ){
+                return true;
+            }
+
+            // there are rows visible, so hide the message row
+            $('.' + emptyMessageClass).hide();
         }
     };
 
 
     $.fn.filterable = function(options){
-        return this.each(function(){
-            new Filterable($(this), options);
-            return this;
-        });
+
+        if ( typeof options === 'undefined' || typeof options === 'object' ){
+            return this.each(function(){
+                if ( !$.data(this, 'plugin_' + pluginName )) {
+                    $.data(this, 'plugin_' + pluginName, new Filterable($(this), options));
+                }
+            });
+        }
+
     };
 })(jQuery, window, document);
