@@ -239,7 +239,14 @@ describe('Filterable jQuery', function(){
         });
 
         xit('should highlight the search term inside the table when configured to do so', function(){
+            $table.filterable({
+                searchHighlighting: true,
+                searchHighlightingClass: 'is-highlighted'
+            });
 
+            $searchBox.val('ubi').trigger('keyup');
+
+            expect($('.is-highlighted').length).toBe(2);
         });
     });
 });

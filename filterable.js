@@ -169,19 +169,11 @@
                 return true;
             }
 
-            var self = this,
-                aCellContainsSearchTerm = false;
+            if ( this.config.caseSensitiveSearch ) {
+                return $('td:contains(' + this.activeSearchTerm + ')', row).length > 0;
+            }
 
-            $(row).find('td').each(function(){
-                var cellText = self.config.caseSensitiveSearch ? $(this).text() : $(this).text().toUpperCase();
-
-                if ( cellText.indexOf(self.activeSearchTerm) > -1 ) {
-                    aCellContainsSearchTerm = true;
-                    return false;
-                }
-            });
-
-            return aCellContainsSearchTerm;
+            return $('td:containsNC(' + this.activeSearchTerm + ')', row).length > 0;
         },
 
         updateFilter: function(columnIndex, value){
@@ -256,4 +248,15 @@
         }
 
     };
+
+    // Extend the standard jQuery :contains selector with a case insensitive version
+    // i.e. $('td:containsNC(sEaRcHtErM))
+    // See: http://css-tricks.com/snippets/jquery/make-jquery-contains-case-insensitive/
+    $.extend($.expr[":"], {
+        "containsNC": function(elem, i, match, array) {
+            return (elem.textContent || elem.innerText || "")
+                .toLowerCase().indexOf((match[3] || "").toLowerCase()) >= 0;
+        }
+    });
+
 })(jQuery, window, document);
