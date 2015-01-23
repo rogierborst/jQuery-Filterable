@@ -1,0 +1,28 @@
+{
+  "name": "Filterable",
+  "version": "1.0.0",
+  "authors": [
+    "Rogier <borst@xs4all.nl>"
+  ],
+  "description": "Make tables filterable with this jQuery plugin.",
+  "main": "filterable.js",
+  "moduleType": [
+    "amd"
+  ],
+  "keywords": [
+    "tables",
+    "filter"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "devDependencies": {
+    "jasmine-jquery": "~2.0.6"
+  }
+}

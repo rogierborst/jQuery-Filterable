@@ -1,0 +1,10 @@
+{
+  "src_files": [
+    "filterable.js",
+    "tests/**/*.js"
+  ],
+
+  "framework": "jasmine2",
+
+  "test_page": "testRunner.mustache"
+}

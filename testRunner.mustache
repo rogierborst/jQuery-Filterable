@@ -1,0 +1,29 @@
+<!doctype html>
+<html>
+<head>
+    <title>Filterable test</title>
+
+    <script src="lib/jasmine/lib/jasmine-core/jasmine.js"></script>
+    <script src="lib/jasmine/lib/jasmine-core/jasmine-html.js"></script>
+    <script src="lib/jasmine/lib/jasmine-core/boot.js"></script>
+
+    <script src="/testem.js"></script>
+
+    <script src="https://code.jquery.com/jquery-1.11.2.min.js"></script>
+    <script src="lib/jasmine-jquery/lib/jasmine-jquery.js"></script>
+
+    {{#serve_files}}
+        <script src="{{src}}"></script>
+    {{/serve_files}}
+
+    <script>
+        jasmine.getFixtures().fixturesPath = 'tests/fixtures';
+    </script>
+
+    <link rel="stylesheet" href="lib/jasmine/lib/jasmine-core/jasmine.css">
+</head>
+<body>
+<div id="jasmine_content"></div>
+
+</body>
+</html>
