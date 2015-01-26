@@ -215,7 +215,22 @@ describe('Filterable jQuery', function(){
                 expect(rowsContainingText($table, 'FC 4')).toBeVisible();
             });
         });
+    });
 
+    describe('When working with checkbox values that differ from corresponding cell contents, the plugin', function(){
+        beforeEach(function(){
+            loadFixtures('complexArrayColumns.html');
+            $table = $('#testTable');
+            $controls = $('#filterControls');
+        });
+
+        it('should allow that checkbox value to be translated to cell contents with data properties', function(){
+            $table.filterable();
+            $('#filterProducer :checkbox', $controls).eq(2).trigger('click');
+
+            expect(visibleRows($table).length).toBe(4);
+            expect($(':contains(Ubisoft)')).toBeHidden();
+        });
     });
 
     describe('When using the search box, the plugin...', function(){

@@ -1,0 +1,93 @@
+<!-- http://jsfiddle.net/818Lhybq/2/ -->
+<div id="filterControls">
+    <fieldset id="filterReleased">
+        <label>
+            <input type="checkbox" data-filter-col="1" value="yes" checked>Released
+        </label>
+        <label>
+            <input type="checkbox" data-filter-col="1" value="no" checked>Not yet released
+        </label>
+    </fieldset>
+
+    <fieldset id="filterProducer">
+        <label>
+            <input type="checkbox" data-filter-col="2" data-filter-content="Blizzard" value="b-lizzard" checked>Blizzard
+        </label>
+        <label>
+            <input type="checkbox" data-filter-col="2" data-filter-content="Rockstar" value="r-ockstar" checked>RockStar
+        </label>
+        <label>
+            <input type="checkbox" data-filter-col="2" data-filter-content="Ubisoft" value="u-bisoft" checked>Ubisoft
+        </label>
+    </fieldset>
+
+    <fieldset id="filterGenre">
+        <label>
+            <input type="checkbox" data-filter-col="3" value="role-playing-game" checked>RPG
+        </label>
+        <label>
+            <input type="checkbox" data-filter-col="3" value="adventure" checked>Adventure
+        </label>
+        <label>
+            <input type="checkbox" data-filter-col="3" value="first-person-shooter" checked>FPS
+        </label>
+        <label>
+            <input type="checkbox" data-filter-col="3" value="puzzle" checked>Puzzle
+        </label>
+    </fieldset>
+
+    <label>
+        <input type="search" placeholder="search" id="searchControls">Search
+    </label>
+</div>
+
+<table id="testTable"
+       data-filter-controls="#filterControls"
+       data-search-controls="#searchControls">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Released</th>
+        <th>Producer</th>
+        <th>Type</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr>
+        <td>WoW</td>
+        <td>Yes</td>
+        <td>Blizzard</td>
+        <td>rpg</td>
+    </tr>
+    <tr>
+        <td>GTA V</td>
+        <td>No</td>
+        <td>Rockstar</td>
+        <td>fps, adventure</td>
+    </tr>
+    <tr>
+        <td>FC 4</td>
+        <td>Yes</td>
+        <td>Ubisoft</td>
+        <td>fps, adventure</td>
+    </tr>
+    <tr>
+        <td>Hearthstone</td>
+        <td>Yes</td>
+        <td>Blizzard</td>
+        <td>puzzle</td>
+    </tr>
+    <tr>
+        <td>Assassin's Creed</td>
+        <td>No</td>
+        <td>Ubisoft</td>
+        <td>fps, adventure, puzzle</td>
+    </tr>
+    <tr>
+        <td>Max Payne 3</td>
+        <td>Yes</td>
+        <td>Rockstar</td>
+        <td>fps, puzzle</td>
+    </tr>
+    </tbody>
+</table>

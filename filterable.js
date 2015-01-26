@@ -55,7 +55,9 @@
 
             // Listen for checkbox changes
             self.$controls.on('change', 'input[type=checkbox]', function(){
-                self.updateFilter($(this).data('filter-col'), $(this).val());
+                var $this = $(this),
+                    value = typeof $this.attr('data-filter-content') !== 'undefined' ? $this.data('filter-content') : $this.val();
+                self.updateFilter($this.data('filter-col'), value);
             });
 
             // Listen for changes in the search box
