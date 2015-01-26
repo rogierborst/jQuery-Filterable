@@ -8,6 +8,8 @@
         clearSearchBoxAtStart: false,
         caseSensitiveFilter: false,
         caseSensitiveSearch: false,
+        oddRowClass: '',
+        evenRowClass: '',
         emptyTableMessage: '',
         emptyTableMessageClass: 'empty-table-message',
         arrayColumns: {}
@@ -67,6 +69,19 @@
 
         },
 
+        setRowClasses: function () {
+            $('tbody tr', this.$table).removeClass(this.config.oddRowClass + ' ' + this.config.evenRowClass);
+
+            if ( this.config.oddRowClass ) {
+                // confusing jQuery: the :even and :odd selector is zero-based!
+                $('tbody tr:visible:even', this.$table).addClass(this.config.oddRowClass);
+            }
+
+            if ( this.config.evenRowClass ) {
+                $('tbody tr:visible:odd', this.$table).addClass(this.config.evenRowClass);
+            }
+        },
+
         // Loop through rows and hide or show them
         checkRows: function(){
             var self = this,
@@ -87,6 +102,10 @@
 
             if ( self.config.emptyTableMessage ){
                 self.checkIfTableIsEmpty();
+            }
+
+            if ( self.config.oddRowClass || self.config.evenRowClass ) {
+                self.setRowClasses();
             }
         },
 

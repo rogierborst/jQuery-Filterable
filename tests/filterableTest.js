@@ -110,6 +110,42 @@ describe('Filterable jQuery', function(){
             expect(rowsContainingText($table, 'Blizzard')).toBeVisible();
         });
 
+        it('should apply a class to odd rows after filtering when set so in options', function(){
+            $table.filterable({
+                oddRowClass: 'is-odd'
+            });
+            $(':checkbox[value="Blizzard"]', $controls).trigger('click');
+
+            expect($('tbody tr:visible').eq(0)).toHaveClass('is-odd');
+            expect($('tbody tr:visible').eq(2)).toHaveClass('is-odd');
+        });
+
+        it('should apply a class to even rows after filtering when set so in options', function(){
+            $table.filterable({
+                evenRowClass: 'is-even'
+            });
+            $(':checkbox[value="Blizzard"]', $controls).trigger('click');
+
+            expect($('tbody tr:visible').eq(1)).toHaveClass('is-even');
+            expect($('tbody tr:visible').eq(3)).toHaveClass('is-even');
+        });
+
+        it('should remove odd / even classes before adding them again', function(){
+            $table.filterable({
+                oddRowClass: 'is-odd',
+                evenRowClass: 'is-even'
+            });
+
+            $(':checkbox[value="Blizzard"]', $controls).trigger('click');
+
+            expect(rowsContainingText($table, 'GTA V')).toHaveClass('is-odd');
+
+            $(':checkbox[value="Blizzard"]', $controls).trigger('click');
+
+            expect(rowsContainingText($table, 'GTA V')).not.toHaveClass('is-odd');
+            expect(rowsContainingText($table, 'GTA V')).toHaveClass('is-even');
+        });
+
         it('should be case sensitive in its filtering when set so in options', function(){
             var $blizzardBox = $(':checkbox', $controls).eq(2);
             $blizzardBox.val('blizzard');
