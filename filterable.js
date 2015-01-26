@@ -115,7 +115,7 @@
 
         // Simple check if cell contains filtered text
         checkSimpleFilter: function(text, columnIndex){
-            return $.inArray(text.toUpperCase(), this.activeFilter[columnIndex]) > -1;
+            return $.inArray(text.trim().toUpperCase(), this.activeFilter[columnIndex]) > -1;
         },
 
         // Check how multiple values in a cell compare to a filter

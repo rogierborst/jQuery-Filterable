@@ -110,6 +110,27 @@ describe('Filterable jQuery', function(){
             expect(rowsContainingText($table, 'Blizzard')).toBeVisible();
         });
 
+        it('should be case sensitive in its filtering when set so in options', function(){
+            var $blizzardBox = $(':checkbox', $controls).eq(2);
+            $blizzardBox.val('blizzard');
+            $table.filterable({
+                caseSensitiveFilter: true
+            });
+
+            $blizzardBox.trigger('click');
+
+            expect(rowsContainingText($table, 'Blizzard')).toBeVisible();
+        });
+
+        it('should appropriately hide rows that have extra white-space around their text', function(){
+            $('td:contains("Blizzard")', $table).text('   Blizzard       ');
+            $table.filterable();
+
+            $(':checkbox', $controls).eq(2).trigger('click');
+
+            expect(rowsContainingText($table, '   Blizzard       ')).toBeHidden();
+        });
+
         it('should show a customizable message when all rows are hidden', function(){
             $table.filterable({
                 emptyTableMessage: '<p class="error">No records found matching criteria</p>'
