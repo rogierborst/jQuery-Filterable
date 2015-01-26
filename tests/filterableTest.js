@@ -245,10 +245,7 @@ describe('Filterable jQuery', function(){
 
             expect(visibleRows($table).length).not.toBe(6);
             expect(rowsContainingText($table, 'fps, adventure')).toBeHidden();
-
-
-
-        })
+        });
     });
 
     describe('When using the search box, the plugin...', function(){
@@ -291,8 +288,11 @@ describe('Filterable jQuery', function(){
 
             expect(visibleRows($table).length).toBe(6);
         });
+    });
 
-        xit('should highlight the search term inside the table when configured to do so', function(){
+    xdescribe('When turning on search highlighting, the plugin...', function(){
+
+        it('should highlight the search term inside the table when configured to do so', function(){
             $table.filterable({
                 searchHighlighting: true,
                 searchHighlightingClass: 'is-highlighted'

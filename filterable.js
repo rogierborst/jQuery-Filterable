@@ -204,7 +204,7 @@
                     return key;
                 }
             }, this));
-            
+
             this.checkRows();
         },
 
