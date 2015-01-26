@@ -96,7 +96,7 @@
 
             for ( var i in this.activeFilterColumns ){
                 var currentFilteredColumn = this.activeFilterColumns[i],
-                    textAtColumn = $(row).find('td').eq(currentFilteredColumn).text();
+                    textAtColumn = $(row).find('td').eq(currentFilteredColumn).text().trim();
 
                 // check if we are dealing with an arrayFilter
                 if ( this.config.arrayColumns.hasOwnProperty(currentFilteredColumn) ) {
@@ -117,7 +117,8 @@
 
         // Simple check if cell contains filtered text
         checkSimpleFilter: function(text, columnIndex){
-            return $.inArray(text.trim().toUpperCase(), this.activeFilter[columnIndex]) > -1;
+            var text = this.config.caseSensitiveFilter ? text : text.toUpperCase();
+            return $.inArray(text, this.activeFilter[columnIndex]) > -1;
         },
 
         // Check how multiple values in a cell compare to a filter
@@ -203,7 +204,7 @@
                     return key;
                 }
             }, this));
-
+            
             this.checkRows();
         },
 

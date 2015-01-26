@@ -231,6 +231,24 @@ describe('Filterable jQuery', function(){
             expect(visibleRows($table).length).toBe(4);
             expect($(':contains(Ubisoft)')).toBeHidden();
         });
+
+        it('should handle array columns the same way', function(){
+            $table.filterable({
+                arrayColumns: {
+                    3: {
+                        separator: ', '
+                    }
+                }
+            });
+            $('input[value="first-person-shooter"]', $controls).trigger('click');
+            $('input[value="adventure"]', $controls).trigger('click');
+
+            expect(visibleRows($table).length).not.toBe(6);
+            expect(rowsContainingText($table, 'fps, adventure')).toBeHidden();
+
+
+
+        })
     });
 
     describe('When using the search box, the plugin...', function(){
