@@ -39,7 +39,7 @@
             } else {
                 // add all unchecked boxes to the active filter and... filter!
                 $('input:checkbox:not(:checked)', self.$controls).each(function(){
-                    self.updateFilter($(this).data('filter-col'), $(this).val());
+                    self.updateFilter(this);
                 });
             }
 
@@ -57,7 +57,7 @@
             self.$controls.on('change', 'input[type=checkbox]', function(){
                 var $this = $(this),
                     value = typeof $this.attr('data-filter-content') !== 'undefined' ? $this.data('filter-content') : $this.val();
-                self.updateFilter($this.data('filter-col'), value);
+                self.updateFilter(this);
             });
 
             // Listen for changes in the search box
@@ -178,7 +178,11 @@
             return $('td:containsNC(' + this.activeSearchTerm + ')', row).length > 0;
         },
 
-        updateFilter: function(columnIndex, value){
+        updateFilter: function(checkbox){
+            var $checkbox = $(checkbox),
+                columnIndex = $checkbox.data('filter-column'),
+                value = typeof $checkbox.attr('data-filter-content') !== 'undefined' ? $checkbox.data('filter-content') : $checkbox.val();
+            
             value = this.config.caseSensitiveFilter ? value : value.toUpperCase();
             // create array for the filtered column values if it doesn't exist already
             this.activeFilter[columnIndex] = this.activeFilter[columnIndex] || [];
