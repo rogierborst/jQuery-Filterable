@@ -1,3 +1,12 @@
+/*!
+ * Filterable jQuery plugin v1.0.0
+ * https://github.com/rogierborst/jQuery-Filterable
+ *
+ * Copyright 2015 Rogier Borst
+ * Released under the MIT license
+ */
+
+/* global define, require, jQuery */
 ;(function($, window, document, undefined){
     'use strict';
 
@@ -57,8 +66,6 @@
 
             // Listen for checkbox changes
             self.$controls.on('change', 'input[type=checkbox]', function(){
-                var $this = $(this),
-                    value = typeof $this.attr('data-filter-content') !== 'undefined' ? $this.data('filter-content') : $this.val();
                 self.updateFilter(this);
             });
 
@@ -136,7 +143,7 @@
 
         // Simple check if cell contains filtered text
         checkSimpleFilter: function(text, columnIndex){
-            var text = this.config.caseSensitiveFilter ? text : text.toUpperCase();
+            text = this.config.caseSensitiveFilter ? text : text.toUpperCase();
             return $.inArray(text, this.activeFilter[columnIndex]) > -1;
         },
 
