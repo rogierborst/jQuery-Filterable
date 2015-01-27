@@ -2,6 +2,7 @@
   "name": "Filterable",
   "version": "1.0.0",
   "description": "Make tables filterable with this jQuery plugin.",
+  "repository": "https://github.com/rogierborst/jQuery-Filterable",
   "main": "filterable.js",
   "scripts": {
     "test": "testem"
