@@ -56,7 +56,7 @@ $('#my-table').filterable({
   emptyTableMessage: 'No games found matching your current filtering criteria.'
 });
 ```
-which tell the plugin that the values of your checkboxes and the text inside your cells should be exact matches (case sensitive), and that if all rows have been hidden, a message should be displayed inside the table.
+which tells the plugin that the values of your checkboxes and the text inside your cells should be exact matches (case sensitive), and that if all rows have been hidden, a message should be displayed inside the table.
 
 ## Options
 The following options can be used to setup jQuery Filterable:
@@ -72,7 +72,7 @@ Option | Description | Default
 **tickCheckboxesAtStart** *(boolean)* | If you're not sure that all checkboxes will be checked on page load, but you'd like them to be, you can set this to `true`. In that case, the plugin will check all checkboxes in the filter controls container before initializing the filtering capabilities. | *false*
 **clearSearchBoxAtStart** *(boolean)* | Likewise, if you're not sure the search input field will be empty on page load, you can set this to `true` to have the plugin clear it for you. | *false*
 
-## Array Columns
+## Array Data
 Sometimes a single cell might contain multiple values that you want to be able to filter on individually. Consider the following table:
 
 Title | Company | Genre
@@ -83,7 +83,7 @@ World of Warcraft | Blizzard | *rpg*
 
 In this case the 'Genre' column contains a combination of terms that your user may want to filter on.
 
-### Inclusive filtering on array columns
+### Inclusive filtering on array data
 
 Let's say the user unchecks 'rpg'. The plugin hides the last row (containing `World of Warcraft`) as expected, because its genre *only* contains 'rpg'.
 
@@ -91,29 +91,29 @@ But what happens when the user now unchecks 'action' as well? Well, by default n
 
 What we want to happen, is the first row to be hidden too. It contains both unchecked filter terms, separated by a comma. It doesn't contain any extra terms that are currently still checked. It should be hidden. How do we make that happen?
 
-Configuring this kind of behavior is done through the `arrayColumns` object that you can add to your options. For the example above, this is how you'd set things up to get the expected behavior:
+Configuring this kind of behavior is done through the `arrayData` object that you can add to your options. For the example above, this is how you'd set things up to get the expected behavior:
 ```javascript
 $('#my-table').filterable({
-  arrayColumns: {
+  arrayData: {
     2: {
       separator: ', '
     }
   }
 });
 ```
-Here we pass an object to the `arrayColumns` object. The name of this object (`2`) refers to the column index. It is zero-based, so since we want the third column to be treated as an array column, we give it the name `2`.
+Here we pass an object to the `arrayData` object. The name of this object (the integer `2`) refers to the column index. It is zero-based, so since we want the third column to be treated as an array column, we give it the name `2`.
 
 Inside that object we set the separator to be a comma followed by a space, since that is how the individual values are separated inside the cells. And voilá, now things are working fine!
 
-### Exclusive filtering on array columns
+### Exclusive filtering on array data
 In the previous example, when unchecking 'rpg' only, we expected only the last row to be hidden. The first row also contained the term 'rpg', but we expected it to remain visible, since it also contained the term 'action', which was left checked in the filter controls.
 
-But what if we want to also hide the first row in this case? The fact that it contains the term 'rpg' is enough reason to hide it, we don't care that 'action' still matches a checked filter box?
+But what if we want to also hide the first row in this case? The fact that it contains the term 'rpg' is enough reason to hide it, we don't care that 'action' still matches a checked filter box.
 
 In that case we're doing 'exclusive' filtering. The moment one term matches an unchecked checkbox, we hide the row. This is done by adding the following key value pair to your arrayColumns options object:
 ```javascript
 $('#my-table').filterable({
-  arrayColumns: {
+  arrayData: {
     2: {
       separator: ', ',
       exclusive: true // setup the third column for exclusive array filtering
@@ -122,3 +122,48 @@ $('#my-table').filterable({
 });
 ```
 
+## Table Row Data Attributes (since v1.1)
+Sometimes there is information on a record that you don't want to actually show in a column, but you *do* want your user to be able to filter on. For example:
+
+Title | Company
+------|---------
+Assassin`s Creed | Ubisoft
+GTA V | Rockstar 
+World of Warcraft | Blizzard
+
+In this case, we've decided *not* to show the genres that apply to each game in a table cell. If we do want our user to be able to filter on genre, we can use data attributes on the table rows, like so:
+
+```html
+<tr data-genres="adventure, fps, puzzle">
+  <td>Assassin's Creed</td>
+  <td>Ubisoft</td>
+</tr>
+<tr data-genres="adventure, fps">
+  <td>GTA V</td>
+  <td>Rockstar</td>
+</tr>
+// etc
+```
+
+In our checkboxes, instead of using `data-filter-column`, we now use `data-filter-row-data` like so:
+
+```html
+<label>
+  <input type="checkbox" data-filter-row-data="genres" value="adventure" checked>Adventure
+</label>
+```
+In this example we've actually been using array data ("adventure, fps, puzzle", that's three terms in a comma separated, single string). So to make this work, we'll have to set it up correctly using JavaScript:
+
+```javascript
+$('#my-table').filterable({
+  arrayData: {
+    'genres': {
+      separator: ', ',
+      exclusive: false // only hide row if all of its terms are ticked off
+    }
+  }
+});
+```
+Notice here how the name of the object ("genres") is a string, not an integer. This way the Filterable plugin knows it should look for data attributes on a table row instead of cell contents in a particular column.
+
+For simple filtering on data attributes (i.e. no comma separated, multiple values), all you need is the proper HTML set up and you're good to go!
