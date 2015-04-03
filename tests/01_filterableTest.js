@@ -195,64 +195,6 @@ describe('Filterable jQuery', function(){
         });
     });
 
-    describe('When working with array columns', function(){
-
-        describe('in non-exclusive mode, the plugin...', function(){
-
-            beforeEach(function(){
-                $table.filterable({
-                    arrayColumns: {
-                        3: {
-                            separator: ', ',
-                            exclusive: false
-                        }
-                    }
-                });
-            });
-
-            it('should hide rows that match all unchecked filters', function(){
-                $(':checkbox', $controls).filter(function(){
-                    return $(this).val() === 'fps' || $(this).val() === 'adventure';
-                }).trigger('click');
-
-                expect(visibleRows($table).length).toBe(4);
-                expect(rowsContainingText($table, 'fps, adventure')).toBeHidden();
-            });
-
-            it('should not hide rows that don\'t match all unchecked filters', function(){
-                // click the 'puzzle' checkbox
-                $('#filterGenre :checkbox', $controls).eq(3).trigger('click');
-
-                expect(visibleRows($table).length).toBe(5);
-                expect(rowsContainingText($table, 'puzzle')).toBeHidden();
-                expect(rowsContainingText($table, 'fps, puzzle')).toBeVisible();
-            });
-        });
-
-        describe('in exclusive mode, the plugin...', function(){
-            beforeEach(function(){
-                $table.filterable({
-                    arrayColumns: {
-                        3: {
-                            separator: ', ',
-                            exclusive: true
-                        }
-                    }
-                });
-            });
-
-            it('should hide rows that match any of the unchecked filters', function(){
-                // click the 'puzzle' checkbox
-                $('#filterGenre :checkbox', $controls).eq(3).trigger('click');
-
-                expect(visibleRows($table).length).toBe(3);
-                expect(rowsContainingText($table, 'WoW')).toBeVisible();
-                expect(rowsContainingText($table, 'GTA V')).toBeVisible();
-                expect(rowsContainingText($table, 'FC 4')).toBeVisible();
-            });
-        });
-    });
-
     describe('When working with checkbox values that differ from corresponding cell contents, the plugin', function(){
         beforeEach(function(){
             loadFixtures('complexArrayColumns.html');
@@ -266,21 +208,6 @@ describe('Filterable jQuery', function(){
 
             expect(visibleRows($table).length).toBe(4);
             expect($(':contains(Ubisoft)')).toBeHidden();
-        });
-
-        it('should handle array columns the same way', function(){
-            $table.filterable({
-                arrayColumns: {
-                    3: {
-                        separator: ', '
-                    }
-                }
-            });
-            $('input[value="first-person-shooter"]', $controls).trigger('click');
-            $('input[value="adventure"]', $controls).trigger('click');
-
-            expect(visibleRows($table).length).not.toBe(6);
-            expect(rowsContainingText($table, 'fps, adventure')).toBeHidden();
         });
     });
 
@@ -341,12 +268,12 @@ describe('Filterable jQuery', function(){
     });
 });
 
-function rowsContainingText($table, value){
-    return $('td', $table).filter(function(){
-        return $(this).text() === value;
-    }).closest('tr');
-}
-
-function visibleRows($table){
-    return $('tbody tr:visible', $table);
-}
+//function rowsContainingText($table, value){
+//    return $('td', $table).filter(function(){
+//        return $(this).text() === value;
+//    }).closest('tr');
+//}
+//
+//function visibleRows($table){
+//    return $('tbody tr:visible', $table);
+//}

@@ -1,0 +1,78 @@
+<div id="filterControls">
+    <fieldset id="filterReleased">
+        <label>
+            <input type="checkbox" data-filter-row-data="released" value="yes" checked>Released
+        </label>
+        <label>
+            <input type="checkbox" data-filter-row-data="released" value="no" checked>Not yet released
+        </label>
+    </fieldset>
+
+    <fieldset id="filterProducer">
+        <label>
+            <input type="checkbox" data-filter-column="1" value="Blizzard" checked>Blizzard
+        </label>
+        <label>
+            <input type="checkbox" data-filter-column="1" value="Rockstar" checked>RockStar
+        </label>
+        <label>
+            <input type="checkbox" data-filter-column="1" value="Ubisoft" checked>Ubisoft
+        </label>
+    </fieldset>
+
+    <fieldset id="filterGenre">
+        <label>
+            <input type="checkbox" data-filter-row-data="genres" value="rpg" checked>RPG
+        </label>
+        <label>
+            <input type="checkbox" data-filter-row-data="genres" value="adventure" checked>Adventure
+        </label>
+        <label>
+            <input type="checkbox" data-filter-row-data="genres" value="fps" checked>FPS
+        </label>
+        <label>
+            <input type="checkbox" data-filter-row-data="genres" value="puzzle" checked>Puzzle
+        </label>
+    </fieldset>
+
+    <label>
+        <input type="search" placeholder="search" id="searchControls">Search
+    </label>
+</div>
+
+<table id="testTable"
+       data-filter-controls="#filterControls"
+       data-search-controls="#searchControls">
+    <thead>
+    <tr>
+        <th>Name</th>
+        <th>Producer</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr data-released="yes" data-genres="rpg">
+        <td>WoW</td>
+        <td>Blizzard</td>
+    </tr>
+    <tr data-released="no" data-genres="fps, adventure">
+        <td>GTA V</td>
+        <td>Rockstar</td>
+    </tr>
+    <tr data-released="yes" data-genres="fps, adventure">
+        <td>FC 4</td>
+        <td>Ubisoft</td>
+    </tr>
+    <tr data-released="yes" data-genres="puzzle">
+        <td>Hearthstone</td>
+        <td>Blizzard</td>
+    </tr>
+    <tr data-released="no" data-genres="fps, adventure, puzzle">
+        <td>Assassin's Creed</td>
+        <td>Ubisoft</td>
+    </tr>
+    <tr data-released="yes" data-genres="fps, puzzle">
+        <td>Max Payne 3</td>
+        <td>Rockstar</td>
+    </tr>
+    </tbody>
+</table>

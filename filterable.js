@@ -1,5 +1,5 @@
 /*!
- * Filterable jQuery plugin v1.0.0
+ * Filterable jQuery plugin v1.1.0
  * https://github.com/rogierborst/jQuery-Filterable
  *
  * Copyright 2015 Rogier Borst
@@ -21,15 +21,14 @@
         evenRowClass: '',
         emptyTableMessage: '',
         emptyTableMessageClass: 'empty-table-message',
-        arrayColumns: {}
+        arrayData: {}
     };
 
     function Filterable($table, options){
         var self = this;
         self.config = $.extend({}, defaults, options);
         self.$table = $table;
-        self.activeFilter = {};
-        self.activeFilterColumns = [];
+        self.activeFilters = [];
         self.activeSearchTerm = '';
         self.numberOfColumns = 0;
 
@@ -50,7 +49,7 @@
             } else {
                 // add all unchecked boxes to the active filter and... filter!
                 $('input:checkbox:not(:checked)', self.$controls).each(function(){
-                    self.updateFilter(this);
+                    self._onCheckboxChange(this);
                 });
             }
 
@@ -61,12 +60,12 @@
             }
 
             if ( self.config.emptyTableMessage ){
-                self.setupEmptyTableMessage();
+                self._setupEmptyTableMessage();
             }
 
             // Listen for checkbox changes
             self.$controls.on('change', 'input[type=checkbox]', function(){
-                self.updateFilter(this);
+                self._onCheckboxChange(this);
             });
 
             // Listen for changes in the search box
@@ -95,12 +94,11 @@
                 emptyMessageClass = self.config.emptyTableMessageClass;
 
             $('tbody tr', self.$table).each(function(){
-                // skip the "empty table message" row
                 if ( $(this).hasClass(emptyMessageClass) ){
                     return;
                 }
 
-                if ( self.rowIsFiltered(this) || !self.rowContainsSearchItem(this) ){
+                if ( self._rowIsFiltered(this) || !self._rowContainsSearchItem(this) ){
                     $(this).hide();
                 } else {
                     $(this).show();
@@ -117,83 +115,60 @@
         },
 
         // Check if row should be hidden
-        rowIsFiltered: function(row){
-            var someCellFailsFilter = false;
-
-            for ( var i in this.activeFilterColumns ){
-                var currentFilteredColumn = this.activeFilterColumns[i],
-                    textAtColumn = $(row).find('td').eq(currentFilteredColumn).text().trim();
-
-                // check if we are dealing with an arrayFilter
-                if ( this.config.arrayColumns.hasOwnProperty(currentFilteredColumn) ) {
-                    if ( this.checkArrayFilter(textAtColumn, currentFilteredColumn) ) {
-                        someCellFailsFilter = true;
-                        break;
-                    }
-                } else {
-                    if ( this.checkSimpleFilter(textAtColumn, currentFilteredColumn) ){
-                        someCellFailsFilter = true;
-                        break;
-                    }
+        _rowIsFiltered: function(row){
+            for ( var filter in this.activeFilters ) {
+                if ( this._checkFilter(this.activeFilters[filter], row) === true ) {
+                    return true;
                 }
             }
 
-            return someCellFailsFilter;
+            return false;
         },
 
-        // Simple check if cell contains filtered text
-        checkSimpleFilter: function(text, columnIndex){
-            text = this.config.caseSensitiveFilter ? text : text.toUpperCase();
-            return $.inArray(text, this.activeFilter[columnIndex]) > -1;
+        _checkFilter: function(filter, row) {
+            var value = ( filter.scope === 'cell' ) ? $(row).find('td').eq(filter.name).text() : $(row).attr('data-' + filter.name);
+            value = this.config.caseSensitiveFilter ? $.trim(value) : $.trim(value.toUpperCase());
+
+            if ( filter.type === 'simple' ) return this._checkSimpleFilter(filter, value);
+            if ( filter.type === 'array' ) return this._checkArrayFilter(filter, value);
         },
 
-        // Check how multiple values in a cell compare to a filter
-        checkArrayFilter: function(text, columnIndex){
-            var separator = this.config.arrayColumns[columnIndex].separator,
-                exclusive = this.config.arrayColumns[columnIndex].exclusive,
-                textItems = text.split(separator);
+        _checkSimpleFilter: function(filter, value) {
+            return $.inArray(value, filter.terms) > -1;
+        },
 
-            if ( ! this.config.caseSensitiveFilter ){
-                textItems = $.map(textItems, function(text){
-                    return text.toUpperCase();
-                });
-            }
+        _checkArrayFilter: function(filter, value) {
+            var textItems = value.split(filter.separator);
 
-            // For speed, we check if the cell contains more items than the filter.
-            // If so, we know that some of those items are NOT filtered
-            if ( ! exclusive && textItems.length > this.activeFilter[columnIndex].length ) {
+            // For speed, we first check if the textItems array contains more items than the filter terms.
+            if ( ! filter.exclusive && textItems.length > filter.terms.length ) {
                 return false;
             }
 
-            // Next we go over each each cell item and check if it is filtered.
-            // The moment we find an item that is not in the filter, we know we
-            // should show the row, so we break.
-
-            if ( exclusive ) {
-                var textIsInFilter = false;
-
-                for ( var i in textItems ) {
-                    if ($.inArray(textItems[i], this.activeFilter[columnIndex]) > - 1 ) {
-                        textIsInFilter = true;
+            for ( var i in textItems ) {
+                if ( $.inArray(textItems[i], filter.terms) > -1 ) {
+                    // a text item was found that matches a filter term
+                    if ( filter.exclusive ) {
+                        // if the filter is exclusive, we must HIDE this row immediately
+                        return true;
+                    }
+                } else {
+                    // a text item was found that does not match a filter term
+                    if ( ! filter.exclusive ) {
+                        // if the filter is inclusive, we must SHOW this row immediately
+                        return false;
                     }
                 }
-
-                return textIsInFilter;
             }
-
-            for ( var j in textItems ) {
-                if ($.inArray(textItems[j], this.activeFilter[columnIndex]) === -1 ) {
-                    return false;
-                }
-            }
-
-            // Nothing made us decide the row should NOT be filtered, so we return
-            // TRUE, meaning: yes, go ahead and hide this row.
-            return true;
+            // The row was not shown or hidden immediately.
+            // For exclusive filtering, this means the row should be visible.
+            // For inclusive filtering, this means we didn't find a reason to
+            // show this row, so it should be hidden (return TRUE)
+            return filter.exclusive ? false : true;
         },
 
         // Check if any cell in a row contains the current search term
-        rowContainsSearchItem: function(row){
+        _rowContainsSearchItem: function(row){
             if ( this.activeSearchTerm === '' ) {
                 return true;
             }
@@ -205,33 +180,69 @@
             return $('td:containsNC(' + this.activeSearchTerm + ')', row).length > 0;
         },
 
-        updateFilter: function(checkbox){
+        _onCheckboxChange: function(checkbox){
             var $checkbox = $(checkbox),
-                columnIndex = $checkbox.data('filter-column'),
-                value = typeof $checkbox.attr('data-filter-content') !== 'undefined' ? $checkbox.data('filter-content') : $checkbox.val();
-            
+                value = typeof $checkbox.data('filter-content') !== 'undefined' ? $checkbox.data('filter-content') : $checkbox.val(),
+                filterName,
+                status = $(checkbox).is(':checked') ? 'off' : 'on';
+
+            filterName = $checkbox.data('filterColumn') || $checkbox.data('filterRowData');
             value = this.config.caseSensitiveFilter ? value : value.toUpperCase();
-            // create array for the filtered column values if it doesn't exist already
-            this.activeFilter[columnIndex] = this.activeFilter[columnIndex] || [];
 
-            var foundAtIndex = $.inArray(value, this.activeFilter[columnIndex]);
-
-            if (foundAtIndex > -1) {
-                // remove the value from the array if it already exists
-                this.activeFilter[columnIndex].splice(foundAtIndex, 1);
-            } else {
-                // add the value if it doesn't exist yet
-                this.activeFilter[columnIndex].push(value);
-            }
-
-            // Keep track if which columns actually have a filter active
-            this.activeFilterColumns = $.map(this.activeFilter, $.proxy(function(value, key){
-                if ( this.activeFilter[key].length ) {
-                    return key;
-                }
-            }, this));
+            this.updateFilters(filterName, value, status);
 
             this.checkRows();
+        },
+
+        updateFilters: function (filterName, value, status) {
+            // if filter exists, update it
+            var filter = {},
+                filterIndex = -1;
+
+            for ( var i=0; i < this.activeFilters.length; i++ ) {
+                if ( this.activeFilters[i].name === filterName ) {
+                    filter = this.activeFilters[i];
+                    filterIndex = i;
+                    break;
+                }
+            }
+
+            if ( filterIndex  < 0 ) {
+                // set up a new filter
+                filter.type = typeof this.config.arrayData[filterName] !== 'undefined' ? 'array' : 'simple';
+                filter.scope = typeof filterName === 'number' ? 'cell' : 'row';
+                filter.name = filterName;
+                filter.terms = [];
+
+                if ( filter.type === 'array' ) {
+                    filter.exclusive = this.config.arrayData[filterName].exclusive || false;
+                    filter.separator = this.config.arrayData[filterName].separator || ', ';
+                }
+            }
+
+            filter = this._updateFilterTerms(filter, value, status);
+
+            if ( filter.terms.length < 1 ) {
+                this.activeFilters.splice(filterIndex, 1);  // no term, so delete the filter
+            } else if ( filterIndex > -1 ) {
+                this.activeFilters[filterIndex] = filter;   // filter exists, update it
+            } else {
+                this.activeFilters.push(filter);            // new filter, add it
+            }
+        },
+
+        _updateFilterTerms: function(filter, term, status){
+            if ( status === 'on' ) {
+                filter.terms.push(term);
+            } else {
+                for ( var i = filter.terms.length-1; i >= 0; i--) {
+                    if ( filter.terms[i] === term ) {
+                        filter.terms.splice(i, 1);
+                    }
+                }
+            }
+
+            return filter;
         },
 
         updateSearchTerm: function(searchTerm){
@@ -239,7 +250,7 @@
             this.checkRows();
         },
 
-        setupEmptyTableMessage: function(){
+        _setupEmptyTableMessage: function(){
             var $row = $('<tr></tr>').addClass(this.config.emptyTableMessageClass);
 
             $('<td></td>')
