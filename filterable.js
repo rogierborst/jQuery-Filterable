@@ -127,7 +127,7 @@
 
         _checkFilter: function(filter, row) {
             var value = ( filter.scope === 'cell' ) ? $(row).find('td').eq(filter.name).text() : $(row).attr('data-' + filter.name);
-            value = this.config.caseSensitiveFilter ? $.trim(value) : $.trim(value.toUpperCase());
+            value = this.config.caseSensitiveFilter ? $.trim(value) : $.trim(value).toUpperCase();
 
             if ( filter.type === 'simple' ) return this._checkSimpleFilter(filter, value);
             if ( filter.type === 'array' ) return this._checkArrayFilter(filter, value);
@@ -182,12 +182,14 @@
 
         _onCheckboxChange: function(checkbox){
             var $checkbox = $(checkbox),
-                value = typeof $checkbox.data('filter-content') !== 'undefined' ? $checkbox.data('filter-content') : $checkbox.val(),
+                value,
                 filterName,
                 status = $(checkbox).is(':checked') ? 'off' : 'on';
 
-            filterName = $checkbox.data('filterColumn') || $checkbox.data('filterRowData');
+            value = typeof $checkbox.data('filter-content') !== 'undefined' ? $checkbox.data('filter-content') : $checkbox.val();
             value = this.config.caseSensitiveFilter ? value : value.toUpperCase();
+
+            filterName = $checkbox.data('filterColumn') || $checkbox.data('filterRowData');
 
             this.updateFilters(filterName, value, status);
 
