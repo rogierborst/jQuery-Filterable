@@ -56,7 +56,7 @@ describe('Filterable jQuery', function(){
                 tickCheckboxesAtStart: true
             });
 
-            expect($(':checked', $controls).length).toBe(9);
+            expect($(':checked', $controls).length).toBe(10);
             expect($('.notInControls')).not.toBeChecked();
         });
 
@@ -68,7 +68,7 @@ describe('Filterable jQuery', function(){
             });
 
             expect($searchBox.val()).toBe('');
-            expect($('tbody tr:visible', $table).length).toBe(6);
+            expect($('tbody tr:visible', $table).length).toBe(7);
         });
 
         it('should immediately filter if any checkboxes are unchecked at page load', function(){
@@ -95,7 +95,7 @@ describe('Filterable jQuery', function(){
 
             $('#filterProducer input').eq(0).trigger('click');
 
-            expect($('tbody tr:visible', $table).length).toBe(4);
+            expect($('tbody tr:visible', $table).length).toBe(5);
             expect(rowsContainingText($table, 'Blizzard')).not.toBeVisible();
         });
 
@@ -108,6 +108,16 @@ describe('Filterable jQuery', function(){
 
             $uncheckedBox.trigger('click');
             expect(rowsContainingText($table, 'Blizzard')).toBeVisible();
+        });
+
+        it('should hide empty rows when checkbox with data-filter-type=empty is unchecked', function(){
+            $table.filterable();
+
+            expect(rowsContainingText($table, '  ')).toBeVisible();
+
+            $('#emptyValues').trigger('click');
+
+            expect(rowsContainingText($table, '  ')).not.toBeVisible();
         });
 
         it('should apply a class to odd rows after filtering when set so in options', function(){
@@ -229,7 +239,7 @@ describe('Filterable jQuery', function(){
 
             $searchBox.val('uBiSOft').trigger('keyup');
 
-            expect(visibleRows($table).length).toBe(2);
+            expect(visibleRows($table).length).toBe(3);
             expect(visibleRows($table)).toEqual(rowsContainingText($table, 'Ubisoft'));
         });
 
@@ -249,31 +259,8 @@ describe('Filterable jQuery', function(){
             $searchBox.val('rockstar').trigger('keyup');
             $searchBox.val('').trigger('keyup');
 
-            expect(visibleRows($table).length).toBe(6);
+            expect(visibleRows($table).length).toBe(7);
         });
     });
 
-    xdescribe('When turning on search highlighting, the plugin...', function(){
-
-        it('should highlight the search term inside the table when configured to do so', function(){
-            $table.filterable({
-                searchHighlighting: true,
-                searchHighlightingClass: 'is-highlighted'
-            });
-
-            $searchBox.val('ubi').trigger('keyup');
-
-            expect($('.is-highlighted').length).toBe(2);
-        });
-    });
 });
-
-//function rowsContainingText($table, value){
-//    return $('td', $table).filter(function(){
-//        return $(this).text() === value;
-//    }).closest('tr');
-//}
-//
-//function visibleRows($table){
-//    return $('tbody tr:visible', $table);
-//}

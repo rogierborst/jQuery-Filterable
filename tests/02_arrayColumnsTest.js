@@ -29,7 +29,7 @@ describe('Filterable jQuery with array columns', function() {
                 return $(this).val() === 'fps' || $(this).val() === 'adventure';
             }).trigger('click');
 
-            expect(visibleRows($table).length).toBe(4);
+            expect(visibleRows($table).length).toBe(5);
             expect(rowsContainingText($table, 'fps, adventure')).toBeHidden();
         });
 
@@ -37,7 +37,7 @@ describe('Filterable jQuery with array columns', function() {
             // click the 'puzzle' checkbox
             $('#filterGenre :checkbox', $controls).eq(3).trigger('click');
 
-            expect(visibleRows($table).length).toBe(5);
+            expect(visibleRows($table).length).toBe(6);
             expect(rowsContainingText($table, 'puzzle')).toBeHidden();
             expect(rowsContainingText($table, 'fps, puzzle')).toBeVisible();
         });
@@ -59,10 +59,11 @@ describe('Filterable jQuery with array columns', function() {
             // click the 'puzzle' checkbox
             $('#filterGenre :checkbox', $controls).eq(3).trigger('click');
 
-            expect(visibleRows($table).length).toBe(3);
+            expect(visibleRows($table).length).toBe(4);
             expect(rowsContainingText($table, 'WoW')).toBeVisible();
             expect(rowsContainingText($table, 'GTA V')).toBeVisible();
             expect(rowsContainingText($table, 'FC 4')).toBeVisible();
+            expect(rowsContainingText($table, '  ')).toBeVisible();
         });
     });
 
